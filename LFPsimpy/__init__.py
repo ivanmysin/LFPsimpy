@@ -9,6 +9,7 @@ class LfpElectrode:
                  x, y, z,
                  sampling_period=0.1,  # in ms
                  method='Line',  # see LFPsimpy.methods
+                 sec_list = None,
                  exclude_regex=".*(?:dummy|myelin|node|branch).*"):
 
         if method not in methods:
@@ -21,6 +22,8 @@ class LfpElectrode:
         self.elec_y = y
         self.elec_z = z
 
+
+
         self.exclude_regex = re.compile(exclude_regex)
 
         self.section_lfps = {}
@@ -29,8 +32,14 @@ class LfpElectrode:
         self.times = []
 
         from neuron import h
+        
+        if sec_list == None:
+            self.sec_list = h.allsec()
+        else:
+            self.sec_list = sec_list
+        
         self.h = h
-
+        
         self.insert()
 
         self.setup_recorder()
@@ -78,7 +87,7 @@ class LfpElectrode:
         else: # self.method == 'RC':
             LfpClass = SectionLfpRCMethod
 
-        for sec in h.allsec():
+        for sec in self.sec_list:   # h.allsec():
             if self.is_lfp_section(sec.name()):
 
                 # Let NEURON create 3D points if missing
