@@ -51,9 +51,10 @@ class LfpElectrode:
         self.check_parallel()
 
     def check_parallel(self):
-        h = self.h
-        self.parallel_ctx = ctx = h.ParallelContext()
-        self.is_parallel = ctx.nhost() > 1
+        # h = self.h
+        self.parallel_ctx = self.h.ParallelContext()
+        self.is_parallel = False #!!!! self.parallel_ctx.nhost() > 1
+
 
     def setup_neuron_plot_vars(self):
         h = self.h
@@ -126,7 +127,7 @@ class LfpElectrode:
         h = self.h
 
         if h.t > h.tstop:
-            if h.t - h.tstop > h.dt and not self.is_parallel or self.parallel_ctx.id() == 0:
+            if (h.t - h.tstop > h.dt+0.0001) and not self.is_parallel or self.parallel_ctx.id() == 0:
                 print('Note: h.t (%s) is more than h.tstop (%s). Please ensure h.tstop is set before '
                       'h.run() or pc.psolve(). Stopping LFP collection. If h.t and h.tstop are within rounding error, '
                       'you can safely ignore this message.' % (h.t, h.tstop))
